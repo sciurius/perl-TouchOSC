@@ -75,13 +75,18 @@ sub add_page {
     return $page;
 }
 
+################ Persistency ################
+
+#### TouchOSC native (zip with indexxml).
+
 sub save {
     my ( $self, %args ) = @_;
-    my $zip = $args{file} || $self->{_file};
+    require Archive::Zip;
+    my $file = $args{file} || $self->{_file} || "__layout.touchosc";
     my $z = Archive::Zip->new;
     my $m = $z->addString( $self->as_string, "index.xml" );
-    $m->desiredCompressionMethod( COMPRESSION_DEFLATED );
-    die unless $z->writeToFileNamed($zip) == 0;
+    $m->desiredCompressionMethod( Archive::Zip::COMPRESSION_DEFLATED() );
+    die unless $z->writeToFileNamed($file) == 0;
 }
 
 sub as_string {
@@ -101,6 +106,67 @@ sub as_string {
     return $res;
 }
 
+sub load {
+    my ( $self, %args ) = @_;
+    my $file = $args{file} || $self->{_file};
+    die("Missing filename in load\n") unless $file;
+
+    require TouchOSC::Import;
+    my $s = TouchOSC::Import->parsefile( file => $file );
+
+    my %atts;
+    $atts{$_} = $s->{$_} for qw( w h mode orientation version );
+
+    if ( $atts{mode} == 0 ) {
+	$atts{w} = 320;
+	$atts{h} = 480;
+    }
+    elsif ( $atts{mode} == 1 ) {
+	$atts{w} = 768;
+	$atts{h} = 1024;
+    }
+    elsif ( $atts{mode} == 2 ) {
+	$atts{w} = 320;
+	$atts{h} = 568;
+    }
+    delete($atts{mode});
+    delete($atts{orientation});
+    $atts{width} = delete($atts{w});
+    $atts{height} = delete($atts{h});
+
+    my $layout = TouchOSC->new( %atts, grid=>1 );
+
+    foreach ( $s->{_pages}->@* ) {
+	$layout->add_page( TouchOSC::Page->load( parent => $layout, data => $_ ) );
+    }
+
+    return $layout;
+}
+
+#### PDF Image (for development)
+
+sub save_pdf {
+    my ( $self, %args ) = @_;
+    require Cairo;
+    my $file = $args{file} || $self->{_file} || "__layout.pdf";
+    my $o = $self->{orientation} eq 'vertical';
+    my $h = $o ? $self->{h} : $self->{w};
+    my $w = $o ? $self->{w} : $self->{h};
+    my $surface = Cairo::PdfSurface->create ( $file, $h, $w );
+    my $cr = Cairo::Context->create ($surface);
+    $cr->select_font_face ('sans', 'normal', 'normal');
+    $cr->rectangle( 0, 0, $h, $w );
+    $cr->set_source_rgba( TouchOSC::Control->cairo_colour("black")->@* );
+    $cr->fill;
+    $self->as_cairo($cr);
+}
+
+sub as_cairo {
+    my ( $self, $cr ) = @_;
+    foreach ( $self->{_pages}->@* ) {
+	$_->as_cairo($cr);
+    }
+}
 
 =head1 LICENSE
 

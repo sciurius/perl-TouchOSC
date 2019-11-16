@@ -137,4 +137,16 @@ sub fmt_att {
     undef;
 }
 
+sub as_cairo {
+    my ( $self, $cr ) = @_;
+
+    my ( $x, $y, $w, $h ) = map { $_ * $self->{_grid} } @{$self}{qw( x y w h)};
+
+    $cr->rrectangle ( $x, $y, $w, $h );
+    my $col = $self->{color};
+    $cr->set_source_rgba( $self->cairo_colour($col)->@* );
+    $cr->stroke;
+
+}
+
 1;

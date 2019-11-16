@@ -92,5 +92,55 @@ sub as_string {
     return $res;
 }
 
+sub as_cairo {
+    my ( $self, $cr ) = @_;
+    my $w = $self->{_w} > $self->{_h} ? $self->{_w} : $self->{_h};
+    $w *= $self->{_grid};
+
+    $cr->save;
+    $cr->rectangle ( 0, 0, $w-40, 40 );
+    $cr->set_source_rgba( $self->cairo_colour("lightgray")->@* );
+    $cr->fill;
+    $cr->arc ( $w-20, 20, 12, 0, 6.28 );
+    $cr->fill;
+
+    if ( $self->{la_t} && $self->{la_s} ) {
+	$cr->select_font_face ('sans', 'normal', 'normal');
+	$cr->set_font_size ( $self->{la_s} );
+	my $te = $cr->text_extents( $self->{la_t} );
+	$cr->move_to( ($w-40 - $te->{width})/2,
+		      (40-$te->{height})/2 - $te->{y_bearing}
+		    );
+	$cr->set_source_rgba( $self->cairo_colour($self->{la_c})->@* );
+	$cr->show_text($self->{la_t});
+	$cr->stroke;
+    }
+    $cr->restore;
+
+    $cr->translate( 0, 40 );
+    foreach ( $self->{_controls}->@* ) {
+	$_->as_cairo($cr);
+    }
+    $cr->show_page;
+}
+
+sub load {
+    my ( $pkg, %atts ) = @_;
+
+    my $parent = $atts{parent};
+    my $data = $atts{data};
+
+    %atts = ();
+    $atts{$_} = $data->{$_}
+      for qw( name la_t la_s la_b la_c la_o li_t li_s li_b li_c li_o );
+
+    my $page = $pkg->new( parent => $parent, %atts);
+
+    foreach ( $data->{_controls}->@* ) {
+	$page->add_control( parent => $page, %$_ );
+    }
+
+    return $page;
+}
 
 1;

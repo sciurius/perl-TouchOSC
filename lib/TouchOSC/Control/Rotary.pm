@@ -49,4 +49,23 @@ sub fmt_att {
     undef;
 }
 
+sub as_cairo {
+    my ( $self, $cr ) = @_;
+
+    my ( $x, $y, $w, $h ) = map { $_ * $self->{_grid} } @{$self}{qw( x y w h)};
+
+    #$cr->rrectangle ( $x, $y, $w, $h );
+    my $o = $self->{type} =~ /v$/;
+
+    $cr->save;
+    $cr->translate($x + $w/2, $y + $w/2);
+    $cr->rotate( 2*atan2(1,1) ) if $o;
+    $cr->arc ( 0, 0, $w/2-2, 0.4, 5.88 );
+    $cr->line_to( 0, 0 );
+    my $col = $self->{color};
+    $cr->set_source_rgba( $self->cairo_colour($col)->@* );
+    $cr->stroke;
+    $cr->restore;
+}
+
 1;

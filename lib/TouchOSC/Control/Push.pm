@@ -18,8 +18,10 @@ sub init {
     $self->{local_off} = delete( $init->{local_off} ) // 1;
 
     # Push sends scalet, release sends scalef.
-    $self->{sp} = delete( $init->{send_on_push} ) // 1;
-    $self->{sr} = delete( $init->{send_on_release} ) // 1;
+    $self->{sp} = delete( $init->{send_on_push} ) //
+      delete( $init->{sp} ) // 1;
+    $self->{sr} = delete( $init->{send_on_release} ) //
+      delete( $init->{sr} ) // 1;
     $self->{scalef} = delete($init->{scalef}) || 0;
     $self->{scalet} = delete($init->{scalet}) || 1;
 

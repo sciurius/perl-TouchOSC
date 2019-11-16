@@ -47,4 +47,35 @@ sub fmt_att {
     undef;
 }
 
+sub as_cairo {
+    my ( $self, $cr ) = @_;
+
+    my ( $x, $y, $w, $h ) = map { $_ * $self->{_grid} } @{$self}{qw( x y w h)};
+
+    $cr->rrectangle ( $x, $y, $w, $h );
+    my $col = $self->{color};
+    $cr->set_source_rgba( $self->cairo_colour($col)->@* );
+    $cr->stroke;
+
+    my $d = 8;
+    if ( $self->{type} =~ /v$/ ) {
+	$cr->rrectangle( $self->is("centered")
+			 ? $x + ($w-$d)/2
+			 : $self->is("inverted")
+			   ? $x + $w - $d
+			   : $x,
+			 $y, $d, $h );
+    }
+    else {
+	$cr->rrectangle( $x,
+			 $self->is("centered")
+			 ? $y + ($h-$d)/2
+			 : $self->is("inverted")
+			   ? $y
+			   : $y + $h - $d,
+			 $w, $d );
+    }
+    $cr->fill;
+}
+
 1;

@@ -20,4 +20,16 @@ sub init {
 
 }
 
+sub as_cairo {
+    my ( $self, $cr ) = @_;
+
+    my ( $x, $y, $w, $h ) = map { $_ * $self->{_grid} } @{$self}{qw( x y w h)};
+
+    $cr->arc ( $x + $w/2, $y + $w/2, $w/2-2, 0, 2*4*atan2(1,1) );
+    my $col = $self->{color};
+    $cr->set_source_rgba( $self->cairo_colour($col)->@* );
+    $cr->fill;
+
+}
+
 1;

@@ -46,4 +46,34 @@ sub fmt_att {
     undef;
 }
 
+sub as_cairo {
+    my ( $self, $cr ) = @_;
+
+    my ( $x, $y, $w, $h ) = map { $_ * $self->{_grid} } @{$self}{qw( x y w h)};
+
+    $cr->rrectangle ( $x, $y, $w, $h );
+    my $col = $self->{color};
+    $cr->set_source_rgba( $self->cairo_colour($col)->@* );
+    $cr->stroke;
+
+    $cr->select_font_face ('sans', 'normal', 'normal');
+    $cr->set_font_size ( $self->{size} * 72/96);
+    my $te = $cr->text_extents( $self->{text} );
+
+    $cr->save;
+    if ( $self->{type} =~ /h$/ ) {
+	$cr->move_to( $x + ($w - $te->{height})/2,# - $te->{y_bearing},
+		      $y + ($h - $te->{width})/2 );
+	$cr->rotate( 2*atan2(1,1) );
+    }
+    else {
+	$cr->move_to( $x + ($w - $te->{width})/2,
+		      $y + ($h - $te->{height})/2 - $te->{y_bearing} );
+    }
+    $cr->set_source_rgba( TouchOSC::Control->cairo_colour($self->{color})->@* );
+    $cr->show_text($self->{text});
+    $cr->stroke;
+    $cr->restore;
+}
+
 1;
