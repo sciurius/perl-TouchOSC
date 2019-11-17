@@ -182,15 +182,18 @@ sub save_pdf {
     my $surface = Cairo::PdfSurface->create ( $file, $h, $w );
     my $cr = Cairo::Context->create ($surface);
     $cr->select_font_face ('sans', 'normal', 'normal');
-    $cr->rectangle( 0, 0, $h, $w );
-    $cr->set_source_rgba( TouchOSC::Control->cairo_colour("black")->@* );
-    $cr->fill;
     $self->as_cairo($cr);
 }
 
 sub as_cairo {
     my ( $self, $cr ) = @_;
+    my $o = $self->{orientation} eq 'vertical';
+    my $h = $o ? $self->{h} : $self->{w};
+    my $w = $o ? $self->{w} : $self->{h};
     foreach ( $self->{_pages}->@* ) {
+	$cr->rectangle( 0, 0, $h, $w );
+	$cr->set_source_rgba( TouchOSC::Control->cairo_colour("black")->@* );
+	$cr->fill;
 	$_->as_cairo($cr);
     }
 }

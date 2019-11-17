@@ -117,10 +117,12 @@ sub as_cairo {
     }
     $cr->restore;
 
+    $cr->save;
     $cr->translate( 0, 40 );
     foreach ( $self->{_controls}->@* ) {
 	$_->as_cairo($cr);
     }
+    $cr->restore;
     $cr->show_page;
 }
 
