@@ -20,6 +20,17 @@ details.
 
 [Example image](example.png)
 
+## Limitations
+
+I developed this to aid in building TouchOSC layouts for Ardour to be
+used on a tablet.
+
+* Vertical layouts may have issues.
+* Only OSC commands, no MIDI.
+* Only the controls that I needed so far: label, push-button,
+  toggle-button, led indicator, fader and rotary. More will be added
+  when needed.
+
 ## INSTALLATION
 
 To install this module, run the following commands:
