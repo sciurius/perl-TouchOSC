@@ -47,14 +47,21 @@ sub parsefile {
     #### TODO: w / h fiddling.
     @{$layout}{qw(w h)} = @{$layout}{qw(h w)};
     my $o = delete($layout->{orientation}) eq "horizontal";
+    my $need_decode;
 
     while ( $content =~ m;<tabpage\s+(.*?)>\s*(.*)</tabpage>;gs ) {
 	my $page = _parseatts($1);
 	$page->{_controls} = [];
 	my $content = $2;
+
+	# Try to auto-sense whether base64 decoding is needed.
+	unless ( defined $need_decode ) {
+	    $need_decode = decode_base64($page->{name}) =~ /^\w+$/;
+	}
 	for ( qw( name la_t li_t ) ) {
 	    next unless $page->{$_};
-	    $page->{$_} = decode_base64($page->{$_});
+	    $page->{$_} = decode_base64($page->{$_})
+	      if $need_decode;
 	}
 
 	$content =~ s;>\s*</control>;/>;g;
@@ -62,7 +69,8 @@ sub parsefile {
 	    my $ctrl = _parseatts($1);
 	    for ( qw( name osc_cs text ) ) {
 		next unless $ctrl->{$_};
-		$ctrl->{$_} = decode_base64($ctrl->{$_});
+		$ctrl->{$_} = decode_base64($ctrl->{$_})
+		  if $need_decode;
 	    }
 	    if ( $ctrl->{type} =~ /^(fader|label|rotary)([hv])/ ) {
 		$ctrl->{type} = $1;
