@@ -7,6 +7,33 @@ use utf8;
 
 package TouchOSC;
 
+=head1 NAME
+
+TouchOSC - Generate and/or print TouchOSC layouts.
+
+=head1 SUMMARY
+
+    my $layout = TouchOSC->new( height => 800, width => 1280, grid => 20 );
+    my $page = $layout->add_page( title => "Tracks 1-24" );
+    # Note: All dimensions are in grid units!
+    $page->add_control( name => "track1", type => 'label',
+			x => 2, y => 2, w => 5, h => 2,
+			color => 'green',
+			background => 'true',
+			size => 22,
+			osc_cs => '/strip/name/1',
+		      );
+    $layout->save( file => "test.touchosc" );
+
+=head1 ABSTRACT
+
+This toolkit provides a set of modules to read, generate and print
+TouchOSC layouts.
+
+For TouchOSC, see L<https://hexler.net/products/touchosc>.
+
+=cut
+
 use Carp;
 use TouchOSC::Page;
 our @CARP_NOT = qw( TouchOSC::Page );
