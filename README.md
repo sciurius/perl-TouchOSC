@@ -40,6 +40,8 @@ To install this module, run the following commands:
 	make test
 	make install
 
+For PDF generation, perl module C<Cairo> must be installed.
+
 ## SUPPORT AND DOCUMENTATION
 
 Development of this module takes place on GitHub:
