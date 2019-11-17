@@ -13,7 +13,7 @@ our @CARP_NOT = qw( TouchOSC::Page );
 
 use Archive::Zip qw( :ERROR_CODES :CONSTANTS );
 
-our $VERSION = "0.01";
+our $VERSION = "0.02";
 
 sub new {
     my ( $pkg, %init ) = @_;
