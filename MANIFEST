@@ -13,7 +13,6 @@ lib/TouchOSC/Control/Rotary.pm
 lib/TouchOSC/Control/Toggle.pm
 lib/TouchOSC/Import.pm
 lib/TouchOSC/Page.pm
-scripts/dump2.pl
-scripts/editor
+scripts/dump.pl
 scripts/gen.pl
 t/00-load.t
